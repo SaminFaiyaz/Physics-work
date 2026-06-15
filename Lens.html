@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Textbook Optics Calculator</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-light: #475569;
+            --border: #cbd5e1;
+            --success-bg: #eff6ff;
+            --success-border: #3b82f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background-color: var(--card-bg);
+            padding: 2.5rem 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            max-width: 480px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.75rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            letter-spacing: -0.025em;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            background: #f8fafc;
+            padding: 0.75rem;
+            border-radius: 6px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border: 1px dashed var(--border);
+            line-height: 1.4;
+        }
+
+        button {
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .results-container {
+            margin-top: 2rem;
+            display: none;
+            animation: slideUpFade 0.4s ease-out;
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-header {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--bg);
+        }
+
+        .result-card {
+            background: var(--bg);
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #cbd5e1;
+        }
+
+        .result-card.primary {
+            background: var(--success-bg);
+            border-left-color: var(--success-border);
+        }
+
+        .result-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .result-card.primary .result-label {
+            color: #1e3a8a;
+        }
+
+        .result-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .result-card.primary .result-value {
+            color: #1d4ed8;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator-container">
+        <h1>Optics Calculator</h1>
+
+        <div class="form-group">
+            <label for="device-type">Optical Device:</label>
+            <select id="device-type">
+                <option value="none">-- Select Device --</option>
+                <option value="mirror-concave">Concave Mirror</option>
+                <option value="mirror-convex">Convex Mirror (f is negative)</option>
+                <option value="lens-convex">Convex Lens</option>
+                <option value="lens-concave">Concave Lens (f is negative)</option>
+            </select>
+        </div>
+
+        <div class="help-text">
+            Leave <strong>ONE</strong> field empty to calculate it.<br>
+            <strong>Textbook Mode:</strong> Magnification ($m$) uses modulus.
+        </div>
+
+        <div class="form-group">
+            <label for="u-val">Object Distance (u) in cm:</label>
+            <input type="number" id="u-val" step="any" placeholder="e.g., -20">
+        </div>
+
+        <div class="form-group">
+            <label for="v-val">Image Distance (v) in cm:</label>
+            <input type="number" id="v-val" step="any" placeholder="e.g., 10">
+        </div>
+
+        <div class="form-group">
+            <label for="f-val">Focal Length (f) in cm:</label>
+            <input type="number" id="f-val" step="any" placeholder="e.g., 15">
+        </div>
+
+        <button onclick="calculateOptics()">Calculate</button>
+
+        <div class="results-container" id="results-box">
+            <div class="results-header">Calculation Results</div>
+            
+            <div class="result-card primary" id="primary-card">
+                <div class="result-label" id="primary-label">Result</div>
+                <div class="result-value" id="primary-value">-</div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-label">Magnification (|m| - Modulus)</div>
+                <div class="result-value" id="mag-value">-</div>
+            </div>
+
+            <div class="result-card" id="power-card">
+                <div class="result-label">Power (P)</div>
+                <div class="result-value" id="power-value">-</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateOptics() {
+            const device = document.getElementById("device-type").value;
+            
+            if (device === "none") {
+                alert("Please select a lens or mirror type first.");
+                return;
+            }
+
+            const uStr = document.getElementById("u-val").value;
+            const vStr = document.getElementById("v-val").value;
+            const fStr = document.getElementById("f-val").value;
+
+            let u = uStr !== "" ? parseFloat(uStr) : null;
+            let v = vStr !== "" ? parseFloat(vStr) : null;
+            let f = fStr !== "" ? parseFloat(fStr) : null;
+
+            const emptyCount = [u, v, f].filter(val => val === null).length;
+
+            if (emptyCount !== 1) {
+                alert("Please leave exactly ONE field blank to calculate it.");
+                return;
+            }
+
+            // Textbook Rule: Force f to be negative for Convex Mirror and Concave Lens if provided
+            if (f !== null && (device === "mirror-convex" || device === "lens-concave")) {
+                f = -Math.abs(f);
+                document.getElementById("f-val").value = f; // Update input field visually
+            }
+
+            let primaryLabel = "";
+            let primaryValue = "";
+
+            // Formula: 1/f = 1/u + 1/v
+            if (f === null) {
+                f = (u * v) / (u + v);
+                // Force negative sign if the calculated item is f for convex/concave devices
+                if (device === "mirror-convex" || device === "lens-concave") {
+                    f = -Math.abs(f);
+                }
+                document.getElementById("f-val").value = f.toFixed(2);
+                primaryLabel = "Focal Length (f)";
+                primaryValue = `${f.toFixed(2)} cm`;
+            } else if (v === null) {
+                v = (f * u) / (u - f);
+                document.getElementById("v-val").value = v.toFixed(2);
+                primaryLabel = "Image Distance (v)";
+                primaryValue = `${v.toFixed(2)} cm`;
+            } else if (u === null) {
+                u = (f * v) / (v - f);
+                document.getElementById("u-val").value = u.toFixed(2);
+                primaryLabel = "Object Distance (u)";
+                primaryValue = `${u.toFixed(2)} cm`;
+            }
+
+            // Textbook Rule: Magnification is strictly a modulus value |m|
+            let m = Math.abs(v / u);
+
+            // Power calculation (Only for lenses)
+            let powerValue = "";
+            if (device.includes("lens")) {
+                let P = 100 / f;
+                powerValue = `${P.toFixed(2)} D`;
+                document.getElementById("power-card").style.display = "flex";
+            } else {
+                powerValue = "N/A";
+                document.getElementById("power-card").style.display = "none";
+            }
+
+            // Update UI fields
+            document.getElementById("primary-label").innerText = primaryLabel;
+            document.getElementById("primary-value").innerText = primaryValue;
+            document.getElementById("mag-value").innerText = m.toFixed(2);
+            document.getElementById("power-value").innerText = powerValue;
+
+            // Trigger smooth card animation
+            const resultsBox = document.getElementById("results-box");
+            resultsBox.style.display = "none";
+            setTimeout(() => {
+                resultsBox.style.display = "block";
+            }, 10);
+        }
+    </script>
+</body>
+</html>
